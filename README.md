@@ -56,7 +56,7 @@ The project boasts a minimalist yet highly functional design, featuring a bottom
 |------------|-------------|
 |  Suanbekova Aisha  | 22B030589    |
 |   |     |
-
+|  Akhanayeva Aruzhan  | 22B030516   |
 
 
 
