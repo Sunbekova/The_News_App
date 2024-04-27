@@ -69,4 +69,4 @@ The project boasts a minimalist yet highly functional design, featuring a bottom
 | API  |   ✓   |
 | MVVM  |      |
 | Coroutines  |      |
-| Room Databases  |      |
+| Room Databases  |  ✓   |
