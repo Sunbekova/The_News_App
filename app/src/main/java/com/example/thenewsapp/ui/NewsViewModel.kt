@@ -28,7 +28,7 @@ class NewsViewModel(app:Application,val  NewsRepository: NewsRepository): Androi
     var oldSearchQuery:String? = null
 
     init{
-        getHeadlines("us")
+        getHeadlines("ru")
     }
 
     fun getHeadlines(countryCode: String) = viewModelScope.launch {
