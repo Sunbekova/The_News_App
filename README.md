@@ -44,6 +44,9 @@ Bottom Navigation with three categories: headlines, favourites, and search.
 The project boasts a minimalist yet highly functional design, featuring a bottom navigation menu housing three distinct categories: headlines, favorites, and search. Under the headlines section, users can seamlessly access the latest news, all sourced in real-time from a news API. Clicking on a headline opens the corresponding article in a web view, offering a smooth reading experience. The option to save articles to the favorites section is facilitated by a floating action button, allowing users to curate their personalized news feed effortlessly. In the favorites section, saved articles are neatly organized, with intuitive swipe gestures enabling users to remove articles and an undo feature offering added flexibility. The search functionality empowers users to explore a vast array of topics with ease, delivering relevant results promptly. Despite the apparent simplicity of its interface, the project demands a considerable amount of code to deliver its seamless user experience.
 
 
+[Go to up](#news-app)
+
+
 
 
 # Project Preview
@@ -58,6 +61,8 @@ The project boasts a minimalist yet highly functional design, featuring a bottom
 |   |     |
 |  Akhanayeva Aruzhan  | 22B030516   |
 
+[Go to up](#news-app)
+
 
 
 # Used Topics at This Time
@@ -70,3 +75,6 @@ The project boasts a minimalist yet highly functional design, featuring a bottom
 | MVVM  |      |
 | Coroutines  |      |
 | Room Databases  |  ✓   |
+
+[Go to up](#news-app)
+
