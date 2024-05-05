@@ -30,7 +30,6 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentFavouritesBinding.bind(view)
 
-
         newsViewModel = (activity as NewsActivity).newsViewModel
         setupFavouritesRecycler()
 
