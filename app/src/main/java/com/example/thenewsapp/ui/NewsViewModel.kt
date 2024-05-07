@@ -35,7 +35,7 @@ class NewsViewModel(app:Application,val  NewsRepository: NewsRepository): Androi
         headlinesInternet(countryCode)
     }
 
-    fun seachNews(searchQuery: String) = viewModelScope.launch {
+    fun searchNews(searchQuery: String) = viewModelScope.launch {
         searchNewsInternet(searchQuery)
     }
     private fun handleHeadlinesResponse(response: Response<NewsResponse>): Resource<NewsResponse>{
