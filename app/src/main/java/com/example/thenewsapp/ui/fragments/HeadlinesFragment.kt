@@ -28,72 +28,60 @@ import com.example.thenewsapp.util.Constants
 
 
 class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
-
-    lateinit var newsViewModel: NewsViewModel
-    lateinit var newsAdapter: NewsAdapter
+    private lateinit var newsViewModel: NewsViewModel
+    private lateinit var newsAdapter: NewsAdapter
+    private lateinit var binding: FragmentHeadlinesBinding
+    private var isLastPage = false
     lateinit var retryButton: Button
     lateinit var errorText: TextView
     lateinit var itemHeadlinesError: CardView
 
-
-    lateinit var binding: FragmentHeadlinesBinding
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding = FragmentHeadlinesBinding.bind(view)
-
+        newsViewModel = (requireActivity() as NewsActivity).newsViewModel
+        setupHeadlinesRecycler()
+        observeHeadlines()
 
         itemHeadlinesError = view.findViewById(R.id.itemHeadlinesError)
-
-        val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view: View = inflater.inflate(R.layout.item_error, null)
 
         retryButton = view.findViewById(R.id.retryButton)
         errorText = view.findViewById(R.id.errorText)
 
 
-        newsViewModel = (activity as NewsActivity).newsViewModel
-        setupHeadlinesRecycler()
-
-
-        newsAdapter.setOnItemClickListener {
-            val bundle = Bundle().apply {
-                putSerializable("article", it)
-            }
-
-            findNavController().navigate(R.id.action_headlinesFragment_to_articleFragment, bundle)
-        }
-
+        retryButton = view.findViewById(R.id.retryButton)
+        errorText = view.findViewById(R.id.errorText)
 
         retryButton.setOnClickListener {
             newsViewModel.getHeadlines("us")
         }
 
 
+    }
+
+    private fun observeHeadlines() {
         newsViewModel.headlines.observe(viewLifecycleOwner, Observer { response ->
-            when(response){
-                is Resource.Success<*> -> {
+            when(response) {
+                is Resource.Success -> {
                     hideProgressBar()
                     hideErrorMessage()
-                    response.data?.let {newsResponse ->
+                    response.data?.let { newsResponse ->
                         newsAdapter.submitList(newsResponse.articles.toList())
                         val totalPages = newsResponse.totalResults / Constants.QUERY_PAGE_SIZE + 2
                         isLastPage = newsViewModel.headlinesPage == totalPages
-                        if (isLastPage){
+                        if (isLastPage) {
                             binding.recyclerHeadlines.setPadding(0, 0, 0, 0)
                         }
                     }
                 }
-
-                is Resource.Error<*> -> {
+                is Resource.Error -> {
                     hideProgressBar()
                     response.message?.let { message ->
-                        Toast.makeText(activity, "Sorry error: $message", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), "Sorry error: $message", Toast.LENGTH_LONG).show()
                         showErrorMessage(message)
                     }
                 }
-                is Resource.Loading<*> -> {
+                is Resource.Loading -> {
                     showProgressBar()
                 }
             }
@@ -103,38 +91,42 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
     var isScrolling = false
     var isError = false
     var isLoading = false
-    var isLastPage = false
 
+    private fun setupHeadlinesRecycler() {
+        newsAdapter = NewsAdapter().apply {
+            setOnItemClickListener { article ->
+                val bundle = Bundle().apply {
+                    putSerializable("article", article)
+                }
+                (requireActivity() as NewsActivity).openArticleFragment(bundle)
+            }
+        }
 
+        binding.recyclerHeadlines.apply {
+            adapter = newsAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            addOnScrollListener(scrollLisener)
+        }
+    }
 
-    private fun hideProgressBar(){
-
+    private fun hideProgressBar() {
         binding.paginationProgressBar.visibility = View.INVISIBLE
-        isLoading = false
     }
 
-    private fun showProgressBar(){
-
+    private fun showProgressBar() {
         binding.paginationProgressBar.visibility = View.VISIBLE
-        isLoading = true
     }
 
-
-    private fun hideErrorMessage(){
-
+    private fun hideErrorMessage() {
         itemHeadlinesError.visibility = View.INVISIBLE
         isError = false
     }
 
-
-    private fun showErrorMessage(message: String){
-
+    private fun showErrorMessage(message: String) {
         itemHeadlinesError.visibility = View.VISIBLE
         errorText.text = message
         isError = true
     }
-
-
 
     val scrollLisener = object : RecyclerView.OnScrollListener(){
 
@@ -170,15 +162,5 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
             }
         }
 
-    }
-
-
-    private fun setupHeadlinesRecycler(){
-        newsAdapter = NewsAdapter()
-        binding.recyclerHeadlines.apply {
-            adapter = newsAdapter
-            layoutManager = LinearLayoutManager(activity)
-            addOnScrollListener(this@HeadlinesFragment.scrollLisener)
-        }
     }
 }

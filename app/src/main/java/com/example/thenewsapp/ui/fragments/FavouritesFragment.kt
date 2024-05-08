@@ -37,7 +37,7 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
             val bundle = Bundle().apply {
                 putSerializable("article", article)
             }
-            findNavController().navigate(R.id.action_favouritesFragment_to_articleFragment, bundle)
+            (requireActivity() as NewsActivity).openArticleFragment(bundle)
         }
     }
 
@@ -47,7 +47,7 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
                 val bundle = Bundle().apply {
                     putSerializable("article", article)
                 }
-                findNavController().navigate(R.id.action_favouritesFragment_to_articleFragment, bundle)
+                (requireActivity() as NewsActivity).openArticleFragment(bundle)
             }
         }
 
@@ -55,32 +55,6 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
             adapter = newsAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
-
-        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val article = newsAdapter.currentList[position]
-                newsViewModel.deleteArticle(article)
-                Snackbar.make(requireView(), "Removed From Favourites", Snackbar.LENGTH_LONG).apply {
-                    setAction("UNDO") {
-                        newsViewModel.addToFavourites(article)
-                    }
-                    show()
-                }
-            }
-        }
-
-        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.recyclerFavourites)
     }
 }
+
