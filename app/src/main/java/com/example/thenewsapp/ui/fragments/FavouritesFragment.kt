@@ -70,7 +70,7 @@ class FavouritesFragment : Fragment(R.layout.fragment_favourites) {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
-                val article = newsAdapter.differ.currentList[position]
+                val article = newsAdapter.currentList[position]
                 newsViewModel.deleteArticle(article)
                 Snackbar.make(requireView(), "Removed From Favourites", Snackbar.LENGTH_LONG).apply {
                     setAction("UNDO") {
