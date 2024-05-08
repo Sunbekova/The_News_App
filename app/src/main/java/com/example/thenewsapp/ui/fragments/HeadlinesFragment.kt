@@ -67,7 +67,7 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
 
 
         retryButton.setOnClickListener {
-            newsViewModel.getHeadlines("ru")
+            newsViewModel.getHeadlines("us")
         }
 
 
@@ -157,7 +157,7 @@ class HeadlinesFragment : Fragment(R.layout.fragment_headlines) {
             val shouldPaginate = isAtLastItem && isNotAtBeginning && isTotalMoreThanVisible && isScrolling && isNoErrors && isNotLoadingAndNotLastPage
 
             if (shouldPaginate){
-                newsViewModel.getHeadlines("ru")
+                newsViewModel.getHeadlines("us")
                 isScrolling = false
             }
         }
