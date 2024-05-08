@@ -2,16 +2,17 @@ package com.example.thenewsapp.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.thenewsapp.R
 import com.example.thenewsapp.databinding.ActivityNewsBinding
 import com.example.thenewsapp.db.ArticleDatabase
 import com.example.thenewsapp.repository.NewsRepository
-import androidx.activity.viewModels
+
 class NewsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNewsBinding
-    private val newsViewModel: NewsViewModel by viewModels {
+    internal val newsViewModel: NewsViewModel by viewModels {
         NewsViewModelProviderFactory(application, NewsRepository(ArticleDatabase(this)))
     }
 
@@ -25,4 +26,3 @@ class NewsActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
     }
 }
-
