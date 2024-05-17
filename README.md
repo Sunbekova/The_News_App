@@ -53,6 +53,10 @@ The project boasts a minimalist yet highly functional design, featuring a bottom
 
 ![Снимок экрана 2024-05-08 182010](https://github.com/Sunbekova/The_News_App/assets/123359531/e88b1ff1-96bb-41b7-82d8-b85b8a1d2fe2)
 
+
+https://github.com/Sunbekova/The_News_App/assets/123359531/520b23a0-8025-4847-a0bb-51caf4f94dc9
+
+
 [Go to up](#news-app)
 
 
