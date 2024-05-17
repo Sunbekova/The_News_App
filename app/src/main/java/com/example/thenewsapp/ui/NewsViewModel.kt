@@ -80,7 +80,7 @@ class NewsViewModel(app:Application,val  NewsRepository: NewsRepository): Androi
     fun getFavouriteNews() = NewsRepository.getFavouriteNews()
 
     fun deleteArticle(article: Article) = viewModelScope.launch {
-        NewsRepository.upsert(article)
+        NewsRepository.deleteArticle(article)
     }
 
     fun internetConnection(context: Context): Boolean{
