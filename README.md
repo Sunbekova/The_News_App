@@ -78,8 +78,8 @@ https://github.com/Sunbekova/The_News_App/assets/123359531/520b23a0-8025-4847-a0
 | Navigation Components   |   ✓  |
 | Retrofit  |   ✓   |
 | API  |   ✓   |
-| MVVM  |      |
-| Coroutines  |      |
+| MVVM  |    ✓   |
+| Coroutines  |    ✓   |
 | Room Databases  |  ✓   |
 
 [Go to up](#news-app)
