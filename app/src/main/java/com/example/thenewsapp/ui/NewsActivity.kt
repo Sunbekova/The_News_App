@@ -10,6 +10,7 @@ import com.example.thenewsapp.databinding.ActivityNewsBinding
 import com.example.thenewsapp.db.ArticleDatabase
 import com.example.thenewsapp.repository.NewsRepository
 import com.example.thenewsapp.ui.fragments.ArticleFragment
+import com.example.thenewsapp.ui.fragments.HeadlinesFragment
 
 class NewsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNewsBinding
@@ -28,10 +29,11 @@ class NewsActivity : AppCompatActivity() {
     }
 
     fun openArticleFragment(bundle: Bundle) {
-        val articleFragment = ArticleFragment()
-        articleFragment.arguments = bundle
+        val fragment = ArticleFragment().apply {
+            arguments = bundle
+        }
         supportFragmentManager.beginTransaction()
-            .replace(R.id.newsNavHostFragment, articleFragment)
+            .replace(R.id.newsNavHostFragment, fragment)
             .addToBackStack(null)
             .commit()
     }
