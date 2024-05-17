@@ -29,23 +29,79 @@ import kotlinx.coroutines.*
 
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
-    private lateinit var newsViewModel: NewsViewModel
-    private lateinit var newsAdapter: NewsAdapter
-    private lateinit var binding: FragmentSearchBinding
-    private var isLastPage = false
+    lateinit var newsViewModel: NewsViewModel
+    lateinit var newsAdapter: NewsAdapter
+    lateinit var retryButton: Button
     lateinit var errorText: TextView
     lateinit var itemSearchError: CardView
-    lateinit var retryButton: Button
+
+    lateinit var binding: FragmentSearchBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSearchBinding.bind(view)
 
-        setupSearchRecycler()
-        observeSearchNews()
+
+        itemSearchError = view.findViewById(R.id.itemSearchError)
+
+        val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val view: View = inflater.inflate(R.layout.item_error, null)
 
         retryButton = view.findViewById(R.id.retryButton)
         errorText = view.findViewById(R.id.errorText)
+
+
+        newsViewModel = (activity as NewsActivity).newsViewModel
+        setupSearchRecycler()
+
+
+        newsAdapter.setOnItemClickListener { article ->
+            val bundle = Bundle().apply {
+                putSerializable("article", article)
+            }
+            (requireActivity() as NewsActivity).openArticleFragment(bundle)
+        }
+
+        var job: Job? = null
+        binding.searchEdit.addTextChangedListener(){editable ->
+            job?.cancel()
+            job = MainScope().launch {
+                delay(SEARCH_NEWS_TIME_DELAY)
+                editable?.let{
+                    if (editable.toString().isNotEmpty()){
+                        newsViewModel.searchNews(editable.toString())
+                    }
+                }
+            }
+        }
+
+        newsViewModel.searchNews.observe(viewLifecycleOwner, Observer { response ->
+            when(response){
+                is Resource.Success<*> -> {
+                    hideProgressBar()
+                    hideErrorMessage()
+                    response.data?.let {newsResponse ->
+                        newsAdapter.submitList(newsResponse.articles.toList())
+                        val totalPages = newsResponse.totalResults / Constants.QUERY_PAGE_SIZE + 2
+                        isLastPage = newsViewModel.searchNewsPage == totalPages
+                        if (isLastPage){
+                            binding.recyclerSearch.setPadding(0, 0, 0, 0)
+                        }
+                    }
+                }
+
+                is Resource.Error<*> -> {
+                    hideProgressBar()
+                    response.message?.let { message ->
+                        Toast.makeText(activity, "Sorry error: $message", Toast.LENGTH_LONG).show()
+                        showErrorMessage(message)
+                    }
+                }
+                is Resource.Loading<*> -> {
+                    showProgressBar()
+                }
+            }
+        })
 
         retryButton.setOnClickListener {
             if (binding.searchEdit.text.toString().isNotEmpty()){
@@ -57,83 +113,41 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         }
     }
 
-
-
-
-    private fun observeSearchNews() {
-        newsViewModel.searchNews.observe(viewLifecycleOwner, Observer { response ->
-            when (response) {
-                is Resource.Success -> {
-                    hideProgressBar()
-                    hideErrorMessage()
-                    response.data?.let { newsResponse ->
-                        newsAdapter.submitList(newsResponse.articles.toList())
-                        val totalPages = newsResponse.totalResults / Constants.QUERY_PAGE_SIZE + 2
-                        isLastPage = newsViewModel.searchNewsPage == totalPages
-                        if (isLastPage) {
-                            binding.recyclerSearch.setPadding(0, 0, 0, 0)
-                        }
-                    }
-                }
-
-                is Resource.Error -> {
-                    hideProgressBar()
-                    response.message?.let { message ->
-                        Toast.makeText(requireContext(), "Sorry error: $message", Toast.LENGTH_LONG)
-                            .show()
-                        showErrorMessage(message)
-                    }
-                }
-
-                is Resource.Loading -> {
-                    showProgressBar()
-                }
-            }
-        })
-    }
-
-
     var isScrolling = false
     var isError = false
     var isLoading = false
+    var isLastPage = false
 
-    private fun setupSearchRecycler() {
-        newsAdapter = NewsAdapter().apply {
-            setOnItemClickListener { article ->
-                val bundle = Bundle().apply {
-                    putSerializable("article", article)
-                }
-                (requireActivity() as NewsActivity).openArticleFragment(bundle)
-            }
-        }
 
-        binding.recyclerSearch.apply {
-            adapter = newsAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-            addOnScrollListener(scrollLisener)
-        }
-    }
 
-    private fun hideProgressBar() {
+    private fun hideProgressBar(){
+
         binding.paginationProgressBar.visibility = View.INVISIBLE
+        isLoading = false
     }
 
-    private fun showProgressBar() {
+    private fun showProgressBar(){
+
         binding.paginationProgressBar.visibility = View.VISIBLE
+        isLoading = true
     }
 
-    private fun hideErrorMessage() {
+
+    private fun hideErrorMessage(){
+
         itemSearchError.visibility = View.INVISIBLE
         isError = false
     }
 
-    private fun showErrorMessage(message: String) {
+
+    private fun showErrorMessage(message: String){
+
         itemSearchError.visibility = View.VISIBLE
         errorText.text = message
         isError = true
     }
 
-    val scrollLisener = object : RecyclerView.OnScrollListener() {
+    val scrollLisener = object : RecyclerView.OnScrollListener(){
 
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
@@ -148,13 +162,12 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             val isNotLoadingAndNotLastPage = !isLoading && !isLastPage
 
 
-            val isAtLastItem = firstVisibleItemPosition + visibleItemCount >= totalItemCount
+            val isAtLastItem = firstVisibleItemPosition +visibleItemCount >= totalItemCount
             val isNotAtBeginning = firstVisibleItemPosition >= 0
             val isTotalMoreThanVisible = totalItemCount >= Constants.QUERY_PAGE_SIZE
-            val shouldPaginate =
-                isAtLastItem && isNotAtBeginning && isTotalMoreThanVisible && isScrolling && isNoErrors && isNotLoadingAndNotLastPage
+            val shouldPaginate = isAtLastItem && isNotAtBeginning && isTotalMoreThanVisible && isScrolling && isNoErrors && isNotLoadingAndNotLastPage
 
-            if (shouldPaginate) {
+            if (shouldPaginate){
                 newsViewModel.searchNews(binding.searchEdit.text.toString())
                 isScrolling = false
             }
@@ -163,10 +176,20 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
 
-            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+            if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
                 isScrolling = true
             }
         }
 
+    }
+
+
+    private fun setupSearchRecycler(){
+        newsAdapter = NewsAdapter()
+        binding.recyclerSearch.apply {
+            adapter = newsAdapter
+            layoutManager = LinearLayoutManager(activity)
+            addOnScrollListener(this@SearchFragment.scrollLisener)
+        }
     }
 }
