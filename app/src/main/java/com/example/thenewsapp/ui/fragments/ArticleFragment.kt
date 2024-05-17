@@ -4,35 +4,42 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.webkit.WebViewClient
-import androidx.navigation.fragment.navArgs
 import com.example.thenewsapp.R
 import com.example.thenewsapp.databinding.FragmentArticleBinding
 import com.example.thenewsapp.ui.NewsActivity
 import com.example.thenewsapp.ui.NewsViewModel
+import com.example.thenewsapp.models.Article
 import com.google.android.material.snackbar.Snackbar
-
 
 class ArticleFragment : Fragment(R.layout.fragment_article) {
     private lateinit var newsViewModel: NewsViewModel
-    private val args: ArticleFragmentArgs by navArgs()
     private lateinit var binding: FragmentArticleBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Инициализация ViewModel
+        newsViewModel = (requireActivity() as NewsActivity).newsViewModel
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentArticleBinding.bind(view)
-        newsViewModel = (requireActivity() as NewsActivity).newsViewModel
-        val article = args.article
+
+        // Извлечение аргумента из Bundle
+        val article = arguments?.getSerializable("article") as Article?
 
         binding.webView.apply {
             webViewClient = WebViewClient()
-            article.url?.let {
+            article?.url?.let {
                 loadUrl(it)
             }
         }
 
         binding.fab.setOnClickListener {
-            newsViewModel.addToFavourites(article)
-            Snackbar.make(view, "Added to Favourites", Snackbar.LENGTH_SHORT).show()
+            article?.let {
+                newsViewModel.addToFavourites(it)
+                Snackbar.make(view, "Added to Favourites", Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 }
