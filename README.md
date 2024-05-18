@@ -7,8 +7,12 @@ With the bottom navigation menu, which includes three main categories - headline
 The modern and intuitive interface ensures comfortable reading of the news, making the process convenient and enjoyable.
 
 ****
-Code source without NavCantroller in branch "without_navController"
+Code source without Navigation Controller in branch "without_navController"
 https://github.com/Sunbekova/The_News_App/tree/without_navController
+
+About navigation controller:
+The navigation controller is one of the key concepts in navigation. It holds the navigation graph and exposes methods that allow your app to move between the destinations in the graph.
+https://developer.android.com/reference/androidx/navigation/NavController
 ****
 
 
