@@ -1,48 +1,45 @@
 package com.example.thenewsapp.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.thenewsapp.R
+import com.example.thenewsapp.databinding.ItemNewsBinding
 import com.example.thenewsapp.models.Article
 
 class NewsAdapter : ListAdapter<Article, NewsAdapter.ArticleViewHolder>(ArticleDiffCallback()) {
 
-    inner class ArticleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val articleImage: ImageView = itemView.findViewById(R.id.articleImage)
-        val articleSource: TextView = itemView.findViewById(R.id.articleSource)
-        val articleTitle: TextView = itemView.findViewById(R.id.articleTitle)
-        val articleDescription: TextView = itemView.findViewById(R.id.articleDescription)
-        val articleDateTime: TextView = itemView.findViewById(R.id.articleDateTime)
+    inner class ArticleViewHolder(val binding: ItemNewsBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.root.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onItemClickListener?.invoke(getItem(position))
+                }
+            }
+        }
     }
 
     private var onItemClickListener: ((Article) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_news, parent, false)
-        return ArticleViewHolder(itemView)
+        val binding = ItemNewsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ArticleViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ArticleViewHolder, position: Int) {
         val article = getItem(position)
+        holder.binding.apply {
+            Glide.with(root.context)
+                .load(article.urlToImage)
+                .into(articleImage)
 
-        Glide.with(holder.itemView)
-            .load(article.urlToImage)
-            .into(holder.articleImage)
-
-        holder.articleSource.text = article.source?.name
-        holder.articleTitle.text = article.title
-        holder.articleDescription.text = article.description
-        holder.articleDateTime.text = article.publishedAt
-
-        holder.itemView.setOnClickListener {
-            onItemClickListener?.invoke(article)
+            articleSource.text = article.source?.name
+            articleTitle.text = article.title
+            articleDescription.text = article.description
+            articleDateTime.text = article.publishedAt
         }
     }
 
@@ -60,4 +57,3 @@ class NewsAdapter : ListAdapter<Article, NewsAdapter.ArticleViewHolder>(ArticleD
         }
     }
 }
-
